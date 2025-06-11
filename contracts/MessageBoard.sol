@@ -10,4 +10,13 @@ contract MessageBoard {
         string text;
         uint256 timestamp;
     }
+
+    Message[] public messages;
+
+    // Use 'indexed' for debugable
+    event NewMessage(address indexed sender, string text, uint256 timestamp);
+
+    constructor() {
+        // pass
+    }
 }
