@@ -19,4 +19,10 @@ contract MessageBoard {
     constructor() {
         // pass
     }
+
+    function postMessage(string calldata _text) external {
+        Message memory newMessage = Message(msg.sender, _text, block.timestamp);
+        messages.push(newMessage);
+        emit NewMessage(msg.sender, _text, block.timestamp);
+    }
 }
