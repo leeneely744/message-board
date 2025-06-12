@@ -21,6 +21,7 @@ contract MessageBoard {
     }
 
     // calldata: imutable temp memory used in function's parameter only
+    // In the future, it is require 'reentracyGuard' and 'ownerOnly'
     function postMessage(string calldata _text) external {
         // memory: mutable temp memory
         Message memory newMessage = Message(msg.sender, _text, block.timestamp);
