@@ -31,5 +31,18 @@ contract MessageBoard {
     function getMessageCount() external view returns (uint256) {
         return messages.length;
     }
-    
+
+    function getLatestMessages(uint256 count) external view returns (Message[] memory) {
+        uint256 total = messages.length;
+
+        if (count > total) {
+            count = total;
+        }
+
+        Message[] memory latestMessages = new Message[](count);
+        for (uint256 i = 0; i < count; i++) {
+            latestMessages[i] = messages[total - 1 - i];
+        }
+        return latestMessages;
+    }
 }
