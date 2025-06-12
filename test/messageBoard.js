@@ -34,4 +34,25 @@ describe("MessageBoard", function () {
     expect(message.text).to.equal(testText);
     expect(message.timestamp).to.be.a("bigint");
   })
+
+    it("should return the latest N messages in reverse order", async function () {
+    const MessageBoard = await hre.ethers.getContractFactory("MessageBoard");
+    const board = await MessageBoard.deploy();
+    await board.waitForDeployment();
+
+    const [user] = await hre.ethers.getSigners();
+
+    const texts = ["One", "Two", "Three"];
+    for (const text of texts) {
+      await board.connect(user).postMessage(text);
+    }
+
+    const latest = await board.getLatestMessages(2);
+
+    // 最新2件は ["Three", "Two"] の順で返るはず
+    expect(latest.length).to.equal(2);
+    expect(latest[0].text).to.equal("Three");
+    expect(latest[1].text).to.equal("Two");
+  });
+
 });
