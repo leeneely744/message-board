@@ -20,9 +20,16 @@ contract MessageBoard {
         // pass
     }
 
+    // calldata: imutable temp memory used in function's parameter only
     function postMessage(string calldata _text) external {
+        // memory: mutable temp memory
         Message memory newMessage = Message(msg.sender, _text, block.timestamp);
         messages.push(newMessage);
         emit NewMessage(msg.sender, _text, block.timestamp);
     }
+
+    function getMessageCount() external view returns (uint256) {
+        return messages.length;
+    }
+    
 }
