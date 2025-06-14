@@ -7,5 +7,10 @@ async function main() {
 
     await messageBoard.waitForDeployment();
 
-    console.log("MessageBoard deployed to:", messageBoard.address);
+    console.log("MessageBoard deployed to:", messageBoard.target);
 }
+
+main().then(() => process.exit(0)).catch((error) => {
+    console.error(error);
+    process.exit(1);
+});
