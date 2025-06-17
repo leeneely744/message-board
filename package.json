@@ -8,7 +8,7 @@
     "deploy": "hardhat run scripts/deploy.js --network localhost",
     "test": "echo \"Error: no test specified\" && exit 1",
     "console": "hardhat console --network localhost",
-    "faucet": "hardhat faucet --network localhost"
+    "faucet": "hardhat faucet --network localhost --"
   },
   "keywords": [],
   "author": "",

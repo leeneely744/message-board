@@ -1,25 +1,32 @@
+/** @type import('hardhat/config').HardhatUserConfig */
 const { task } = require("hardhat/config");
-
+const { parseEther } = require("ethers");
 require("@nomicfoundation/hardhat-toolbox");
 
-/** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
-  solidity: "0.8.28",
-};
-
-// How to use: npm run faucet --to ${contract_address}
 task("faucet", "Send 10 ETH to an address")
   .addParam("to", "Recipient address")
   .setAction(async ({ to }, hre) => {
     const [sender] = await hre.ethers.getSigners();
-    console.log(`Sending 10 ETH from ${sender.address} -> ${to}`);
+    console.log(`💧  Sending 10 ETH from ${sender.address} → ${to}`);
 
     const tx = await sender.sendTransaction({
       to,
       value: parseEther("10"),
     });
-
     await tx.wait();
 
-    console.log(`Transaction hash: ${tx.hash}`);
+    console.log(`✅  TX mined: ${tx.hash}`);
   });
+
+// npx hardhat balance --account ${contract_address}
+task("balance", "Prints an account's balance")
+  .addParam("account", "The account's address")
+  .setAction(async (taskArgs) => {
+    const balance = await ethers.provider.getBalance(taskArgs.account);
+
+    console.log(ethers.formatEther(balance), "ETH");
+  });
+
+module.exports = {
+  solidity: "0.8.28",
+};
