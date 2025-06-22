@@ -12,9 +12,11 @@ contract MessageBoard {
     }
 
     Message[] public messages;
+    uint256 public totalTip;
 
     // Use 'indexed' for debugable
     event NewMessage(address indexed sender, string text, uint256 timestamp);
+    event TipReceived(address indexed sender, uint256 amount);
 
     constructor() {
         // pass
@@ -22,11 +24,14 @@ contract MessageBoard {
 
     // calldata: imutable temp memory used in function's parameter only
     // In the future, it is require 'reentracyGuard' and 'ownerOnly'
-    function postMessage(string calldata _text) external {
+    // payable: allow payment in the function
+    function postMessage(string calldata _text) external payable {
         // memory: mutable temp memory
         Message memory newMessage = Message(msg.sender, _text, block.timestamp);
         messages.push(newMessage);
         emit NewMessage(msg.sender, _text, block.timestamp);
+        totalTip += msg.value;
+        emit TipReceived(msg.sender, msg.value);
     }
 
     function getMessageCount() external view returns (uint256) {
