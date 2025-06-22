@@ -11,6 +11,7 @@ contract MessageBoard {
         uint256 timestamp;
     }
 
+    // public: automatically generate getter function
     Message[] public messages;
     uint256 public totalTip;
 
