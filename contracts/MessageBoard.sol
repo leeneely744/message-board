@@ -4,6 +4,8 @@ pragma solidity ^0.8.28;
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
+error NotAuthor();
+
 contract MessageBoard {
     struct Message {
         address sender;
@@ -21,6 +23,14 @@ contract MessageBoard {
 
     constructor() {
         // pass
+    }
+
+    modifier onlyAuthor(uint256 id) {
+        require(id < messages.length, "Invalid message ID");
+        if (messages[id].sender != msg.sender) {
+            revert NotAuthor();
+        }
+        _;
     }
 
     // calldata: imutable temp memory used in function's parameter only
