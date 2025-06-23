@@ -5,6 +5,7 @@ pragma solidity ^0.8.28;
 // import "hardhat/console.sol";
 
 error NotAuthor();
+error InvalidMessageId();
 
 contract MessageBoard {
     struct Message {
@@ -20,13 +21,17 @@ contract MessageBoard {
     // Use 'indexed' for debugable
     event NewMessage(address indexed sender, string text, uint256 timestamp);
     event TipReceived(address indexed sender, uint256 amount);
+    event MessageEdited(uint256 indexed id, string newText, uint256 timestamp);
 
     constructor() {
         // pass
     }
 
     modifier onlyAuthor(uint256 id) {
-        require(id < messages.length, "Invalid message ID");
+        if (id >= messages.length) {
+            revert InvalidMessageId();
+        }
+
         if (messages[id].sender != msg.sender) {
             revert NotAuthor();
         }
@@ -43,6 +48,12 @@ contract MessageBoard {
         emit NewMessage(msg.sender, _text, block.timestamp);
         totalTip += msg.value;
         emit TipReceived(msg.sender, msg.value);
+    }
+
+    function editMessage(uint256 id, string calldata newText) external onlyAuthor(id) {
+        messages[id].text = newText;
+        messages[id].timestamp = block.timestamp;
+        emit MessageEdited(id, newText, block.timestamp);
     }
 
     function getMessageCount() external view returns (uint256) {
