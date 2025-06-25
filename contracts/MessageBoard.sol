@@ -6,12 +6,14 @@ pragma solidity ^0.8.28;
 
 error NotAuthor();
 error InvalidMessageId();
+error MessageAlreadyDeleted();
 
 contract MessageBoard {
     struct Message {
         address sender;
         string text;
         uint256 timestamp;
+        bool deleted;
     }
 
     // public: automatically generate getter function
@@ -22,6 +24,7 @@ contract MessageBoard {
     event NewMessage(address indexed sender, string text, uint256 timestamp);
     event TipReceived(address indexed sender, uint256 amount);
     event MessageEdited(uint256 indexed id, string newText, uint256 timestamp);
+    event MessageDeleted(uint256 indexed id, uint256 timestamp);
 
     constructor() {
         // pass
@@ -43,7 +46,7 @@ contract MessageBoard {
     // payable: allow payment in the function
     function postMessage(string calldata _text) external payable {
         // memory: mutable temp memory
-        Message memory newMessage = Message(msg.sender, _text, block.timestamp);
+        Message memory newMessage = Message(msg.sender, _text, block.timestamp, false);
         messages.push(newMessage);
         emit NewMessage(msg.sender, _text, block.timestamp);
         totalTip += msg.value;
@@ -54,6 +57,14 @@ contract MessageBoard {
         messages[id].text = newText;
         messages[id].timestamp = block.timestamp;
         emit MessageEdited(id, newText, block.timestamp);
+    }
+
+    function deleteMessage(uint256 id) external onlyAuthor(id) {
+        if (messages[id].deleted == true) {
+            revert MessageAlreadyDeleted();
+        }
+        messages[id].deleted = true;
+        emit MessageDeleted(id, block.timestamp);
     }
 
     function getMessageCount() external view returns (uint256) {
