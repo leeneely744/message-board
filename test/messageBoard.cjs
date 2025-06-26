@@ -80,4 +80,28 @@ describe("MessageBoard", function () {
     );
   });
 
+  it("should delete own message", async function() {
+    const MessageBoard = await hre.ethers.getContractFactory("MessageBoard");
+    const board = await MessageBoard.deploy();
+    await board.waitForDeployment();
+
+    const [sender] = await hre.ethers.getSigners();
+    const testText = "Hello, blockchain!";
+
+    await board.connect(sender).postMessage(testText);
+
+    // 送信者でなければ削除できない。
+    const [, newSender] = await hre.ethers.getSigners();
+    await expect(board.connect(newSender).deleteMessage(0)).to.be.revertedWithCustomError(
+      board,
+      "NotAuthor"
+    );
+
+    // 送信者なら削除できる。
+    await board.connect(sender).deleteMessage(0);
+    const message = await board.connect(sender).getLatestMessages(1);
+    // 論理削除
+    expect (message[0].deleted).to.equal(true);
+  });
+
 });
