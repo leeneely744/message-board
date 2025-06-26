@@ -75,7 +75,8 @@ describe("MessageBoard", function () {
     // 送信者でなければ編集できない。
     const [, newSender] = await hre.ethers.getSigners();
     await expect(board.connect(newSender).editMessage(0, "Error!")).to.be.revertedWithCustomError(
-      board
+      board,
+      "NotAuthor"
     );
   });
 
