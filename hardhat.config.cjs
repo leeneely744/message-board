@@ -4,6 +4,7 @@ const { parseEther } = require("ethers");
 require("@nomicfoundation/hardhat-toolbox");
 
 // npx hardhat faucet --network localhost --to ${MetaMask_account_address}
+// MetaMsas_account_address: MetaMaskの拡張機能のヘッダー部にかかれているアドレス
 task("faucet", "Send 10 ETH to an address")
   .addParam("to", "Recipient address")
   .setAction(async ({ to }, hre) => {
