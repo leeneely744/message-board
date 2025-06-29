@@ -71,7 +71,7 @@ contract MessageBoard {
         return messages.length;
     }
 
-    function getLatestMessages(uint256 count) external view returns (Message[] memory) {
+    function getLatestMessages(uint256 count) external view returns (uint256[] memory, Message[] memory) {
         uint256 total = messages.length;
 
         if (count > total) {
@@ -79,9 +79,12 @@ contract MessageBoard {
         }
 
         Message[] memory latestMessages = new Message[](count);
+        uint256[] memory ids = new uint256[](count);
         for (uint256 i = 0; i < count; i++) {
-            latestMessages[i] = messages[total - 1 - i];
+            uint256 index = total - 1 - i;
+            latestMessages[i] = messages[index];
+            ids[i] = index;
         }
-        return latestMessages;
+        return (ids, latestMessages);
     }
 }
