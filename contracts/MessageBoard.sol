@@ -71,20 +71,25 @@ contract MessageBoard {
         return messages.length;
     }
 
-    function getLatestMessages(uint256 count) external view returns (uint256[] memory, Message[] memory) {
+    function getLatestMessages(uint256 count) external view returns (uint256[] memory ids, Message[] memory msgs) {
         uint256 total = messages.length;
+        uint256 found;
 
-        if (count > total) {
-            count = total;
+        ids = new uint256[](count);
+        msgs = new Message[](count);
+
+        for (uint256 i = total; i > 0 && found < count; i--) {
+            uint256 idx = i - 1;
+            if (messages[idx].deleted) continue;
+
+            ids[found] = idx;
+            msgs[found] = messages[idx];
+            found++;
         }
 
-        Message[] memory latestMessages = new Message[](count);
-        uint256[] memory ids = new uint256[](count);
-        for (uint256 i = 0; i < count; i++) {
-            uint256 index = total - 1 - i;
-            latestMessages[i] = messages[index];
-            ids[i] = index;
+        assembly {
+            mstore(ids, found)
+            mstore(msgs,found)
         }
-        return (ids, latestMessages);
     }
 }
