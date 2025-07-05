@@ -7,6 +7,7 @@ pragma solidity ^0.8.28;
 error NotAuthor();
 error InvalidMessageId();
 error MessageAlreadyDeleted();
+error TooRapidPost();
 
 contract MessageBoard {
     struct Message {
@@ -19,6 +20,10 @@ contract MessageBoard {
     // public: automatically generate getter function
     Message[] public messages;
     uint256 public totalTip;
+
+    uint256 public constant messageLimit = 10;
+    mapping (address=>uint256) public lastPostAt;
+    uint256 public constant COOLDOWN_SECONDS = 60;
 
     // Use 'indexed' for debugable
     event NewMessage(address indexed sender, string text, uint256 timestamp);
@@ -41,16 +46,25 @@ contract MessageBoard {
         _;
     }
 
+    modifier isNotRapid() {
+        uint256 lastPostTimestamp = lastPostAt[msg.sender];
+        if (block.timestamp - lastPostTimestamp < COOLDOWN_SECONDS) {
+            revert TooRapidPost();
+        }
+        _;
+    }
+
     // calldata: imutable temp memory used in function's parameter only
     // In the future, it is require 'reentracyGuard' and 'ownerOnly'
     // payable: allow payment in the function
-    function postMessage(string calldata _text) external payable {
+    function postMessage(string calldata _text) external payable isNotRapid() {
         // memory: mutable temp memory
         Message memory newMessage = Message(msg.sender, _text, block.timestamp, false);
         messages.push(newMessage);
         emit NewMessage(msg.sender, _text, block.timestamp);
         totalTip += msg.value;
         emit TipReceived(msg.sender, msg.value);
+        lastPostAt[msg.sender] = block.timestamp;
     }
 
     function editMessage(uint256 id, string calldata newText) external onlyAuthor(id) {
