@@ -24,7 +24,7 @@ describe("MessageBoard", function () {
 
     const cooldown = 60;
     for (let index = 0; index < 11; index++) {
-      await (await board.connect(sender).postMessage(testText)).wait();      
+      await (await board.connect(sender).postMessage(testText)).wait();
       await hre.ethers.provider.send("evm_increaseTime", [cooldown]);
       await hre.ethers.provider.send("evm_mine");
     }
@@ -62,11 +62,14 @@ describe("MessageBoard", function () {
     const [user] = await hre.ethers.getSigners();
 
     const texts = ["One", "Two", "Three"];
+    const cooldown = 60;
     for (const text of texts) {
       await board.connect(user).postMessage(text);
+      await hre.ethers.provider.send("evm_increaseTime", [cooldown]);
+      await hre.ethers.provider.send("evm_mine");
     }
 
-    const latest = await board.getLatestMessages(2);
+    const [_, latest] = await board.getLatestMessages(2);
 
     // 最新2件は ["Three", "Two"] の順で返るはず
     expect(latest.length).to.equal(2);
