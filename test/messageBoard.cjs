@@ -1,6 +1,7 @@
 const { expect } = require("chai");
 const hre = require("hardhat");
 
+// npx hardhat test
 describe("MessageBoard", function () {
   it("should deploy successfully", async function () {
     // コントラクトファクトリを取得
@@ -46,8 +47,7 @@ describe("MessageBoard", function () {
     const count = await board.getMessageCount();
     expect(count).to.equal(1);
 
-    const messages = await board.getLatestMessages(1);
-    const message = messages[0];
+    const message = await board.messages(0);
 
     expect(message.sender).to.equal(sender.address);
     expect(message.text).to.equal(testText);
