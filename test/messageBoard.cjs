@@ -118,9 +118,9 @@ describe("MessageBoard", function () {
 
     // 送信者なら削除できる。
     await board.connect(sender).deleteMessage(0);
-    const message = await board.connect(sender).getLatestMessages(1);
+    const message = await board.messages(0);
     // 論理削除
-    expect (message[0].deleted).to.equal(true);
+    expect (message.deleted).to.equal(true);
   });
 
 });
