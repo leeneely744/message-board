@@ -13,6 +13,21 @@ describe("MessageBoard", function () {
     expect(board.target).to.properAddress;
   });
 
+  it("should delete over COOLDOWN_SECONDS message", async function () {
+    const MessageBoard = await hre.ethers.getContractFactory("MessageBoard");
+    const board = await MessageBoard.deploy();
+    await board.waitForDeployment();
+
+    const [sender] = await hre.ethers.getSigners();
+    const testText = "message";
+
+    for (let index = 0; index < 11; index++) {
+      await board.connect(sender).postMessage(testText);      
+    }
+
+    expect(messages[0].deleted).to.equal(true);
+  });
+
   it("should store a message when postMessage is called", async function () {
     const MessageBoard = await hre.ethers.getContractFactory("MessageBoard");
     const board = await MessageBoard.deploy();

@@ -65,6 +65,20 @@ contract MessageBoard {
         totalTip += msg.value;
         emit TipReceived(msg.sender, msg.value);
         lastPostAt[msg.sender] = block.timestamp;
+
+        // delete over COOLDOWN_SECONDS
+        uint256 count = 0;
+        for (uint256 i = messages.length; i > 0; i--) {
+            Message memory target = messages[i-1];
+            if (target.deleted == false) {
+                count++;
+            }
+
+            if (count > COOLDOWN_SECONDS) {
+                target.deleted = true;
+                emit MessageDeleted(i - 1, block.timestamp);
+            }
+        }
     }
 
     function editMessage(uint256 id, string calldata newText) external onlyAuthor(id) {
