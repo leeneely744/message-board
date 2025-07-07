@@ -88,8 +88,8 @@ describe("MessageBoard", function () {
     await board.editMessage(0, editedText);
 
     // 送信者自身であれば編集できる。
-    const latest = await board.getLatestMessages(1);
-    expect (latest[0].text).to.equal(editedText);
+    const [_, msgs] = await board.getLatestMessages(1);
+    expect (msgs[0].text).to.equal(editedText);
 
     // 送信者でなければ編集できない。
     const [, newSender] = await hre.ethers.getSigners();
