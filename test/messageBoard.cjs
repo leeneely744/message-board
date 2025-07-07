@@ -13,7 +13,7 @@ describe("MessageBoard", function () {
     expect(board.target).to.properAddress;
   });
 
-  it("should delete over COOLDOWN_SECONDS message", async function () {
+  it("keeps length at 10 by tombstoning the oldest message", async function () {
     const MessageBoard = await hre.ethers.getContractFactory("MessageBoard");
     const board = await MessageBoard.deploy();
     await board.waitForDeployment();
@@ -21,11 +21,15 @@ describe("MessageBoard", function () {
     const [sender] = await hre.ethers.getSigners();
     const testText = "message";
 
+    const cooldown = 60;
     for (let index = 0; index < 11; index++) {
-      await board.connect(sender).postMessage(testText);      
+      await (await board.connect(sender).postMessage(testText)).wait();      
+      await hre.ethers.provider.send("evm_increaseTime", [cooldown]);
+      await hre.ethers.provider.send("evm_mine");
     }
 
-    expect(messages[0].deleted).to.equal(true);
+    const msg0 = await board.messages(0);
+    expect(msg0.deleted).to.equal(true);
   });
 
   it("should store a message when postMessage is called", async function () {

@@ -66,15 +66,16 @@ contract MessageBoard {
         emit TipReceived(msg.sender, msg.value);
         lastPostAt[msg.sender] = block.timestamp;
 
-        // delete over COOLDOWN_SECONDS
+        // delete over messageLimit
         uint256 count = 0;
         for (uint256 i = messages.length; i > 0; i--) {
-            Message memory target = messages[i-1];
+            // 変更するため storage でなければならない。
+            Message storage target = messages[i - 1];
             if (target.deleted == false) {
                 count++;
             }
 
-            if (count > COOLDOWN_SECONDS) {
+            if (count > messageLimit) {
                 target.deleted = true;
                 emit MessageDeleted(i - 1, block.timestamp);
             }
@@ -95,6 +96,7 @@ contract MessageBoard {
         emit MessageDeleted(id, block.timestamp);
     }
 
+    // TODO: deleted=true を数えないようにする
     function getMessageCount() external view returns (uint256) {
         return messages.length;
     }
