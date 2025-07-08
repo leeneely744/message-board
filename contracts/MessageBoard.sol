@@ -60,12 +60,7 @@ contract MessageBoard {
     // In the future, it is require 'reentracyGuard' and 'ownerOnly'
     // payable: allow payment in the function
     function postMessage(string calldata _text) external payable isNotRapid() {
-        if (
-            bytes(_text).length == 0 && // For test, through "".
-            bytes(_text).length > MAX_TEXT_BYTES
-        ) {
-            revert TooLongText();
-        }
+        if (bytes(_text).length > MAX_TEXT_BYTES) revert TooLongText();
 
         // memory: mutable temp memory
         Message memory newMessage = Message(msg.sender, _text, block.timestamp, false);
