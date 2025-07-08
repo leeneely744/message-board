@@ -60,9 +60,8 @@ contract MessageBoard {
     // In the future, it is require 'reentracyGuard' and 'ownerOnly'
     // payable: allow payment in the function
     function postMessage(string calldata _text) external payable isNotRapid() {
-        // For test, through "".
         if (
-            keccak256(abi.encodePacked(_text)) != keccak256(abi.encodePacked("")) && 
+            bytes(_text).length == 0 && // For test, through "".
             bytes(_text).length > MAX_TEXT_BYTES
         ) {
             revert TooLongText();
