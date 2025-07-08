@@ -8,6 +8,7 @@ error NotAuthor();
 error InvalidMessageId();
 error MessageAlreadyDeleted();
 error TooRapidPost();
+error TooLongText();
 
 contract MessageBoard {
     struct Message {
@@ -24,6 +25,7 @@ contract MessageBoard {
     uint256 public constant messageLimit = 10;
     mapping (address=>uint256) public lastPostAt;
     uint256 public constant COOLDOWN_SECONDS = 60;
+    uint256 public constant MAX_TEXT_BYTES = 32;
 
     // Use 'indexed' for debugable
     event NewMessage(address indexed sender, string text, uint256 timestamp);
@@ -58,6 +60,14 @@ contract MessageBoard {
     // In the future, it is require 'reentracyGuard' and 'ownerOnly'
     // payable: allow payment in the function
     function postMessage(string calldata _text) external payable isNotRapid() {
+        // For test, through "".
+        if (
+            keccak256(abi.encodePacked(_text)) != keccak256(abi.encodePacked("")) && 
+            bytes(_text).length > MAX_TEXT_BYTES
+        ) {
+            revert TooLongText();
+        }
+
         // memory: mutable temp memory
         Message memory newMessage = Message(msg.sender, _text, block.timestamp, false);
         messages.push(newMessage);
