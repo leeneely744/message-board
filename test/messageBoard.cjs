@@ -14,6 +14,20 @@ describe("MessageBoard", function () {
     expect(board.target).to.properAddress;
   });
 
+  it("is limited to 32 bytes", async () => {
+    const MessageBoard = await hre.ethers.getContractFactory("MessageBoard");
+    const board = await MessageBoard.deploy();
+    await board.waitForDeployment();
+
+    const [sender] = await hre.ethers.getSigners();
+    const text32 = "01234567890123456789012345678901"; // 32
+
+    await board.connect(sender).postMessage(text32);
+
+    const msg0 = await board.messages(0);
+    expect(msg0.text).to.equal(text32);
+  })
+
   it("keeps length at 10 by tombstoning the oldest message", async function () {
     const MessageBoard = await hre.ethers.getContractFactory("MessageBoard");
     const board = await MessageBoard.deploy();
