@@ -21,11 +21,18 @@ describe("MessageBoard", function () {
 
     const [sender] = await hre.ethers.getSigners();
     const text32 = "01234567890123456789012345678901"; // 32
-
-    await board.connect(sender).postMessage(text32);
-
+    await (await board.connect(sender).postMessage(text32)).wait();
     const msg0 = await board.messages(0);
     expect(msg0.text).to.equal(text32);
+
+    await hre.ethers.provider.send("evm_increaseTime", [60]);
+    await hre.ethers.provider.send("evm_mine");
+
+    const text33 = "012345678901234567890123456789012"; // 33
+    await expect(board.connect(sender).postMessage(text33)).to.be.revertedWithCustomError(
+      board,
+      "TooLongText"
+    );
   })
 
   it("keeps length at 10 by tombstoning the oldest message", async function () {
