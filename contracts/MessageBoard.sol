@@ -39,7 +39,7 @@ contract MessageBoard {
     }
 
     modifier onlyAuthor(uint256 id) {
-        if (id >= messages.length) {
+        if (id >= messageCount) {
             revert InvalidMessageId();
         }
 
@@ -65,15 +65,16 @@ contract MessageBoard {
 
         // memory: mutable temp memory
         Message memory newMessage = Message(msg.sender, _text, block.timestamp, false);
-        messages.push(newMessage);
         emit NewMessage(msg.sender, _text, block.timestamp);
         totalTip += msg.value;
         emit TipReceived(msg.sender, msg.value);
         lastPostAt[msg.sender] = block.timestamp;
+        messages[messageCount] = newMessage;
+        messageCount++;
 
         // delete over messageLimit
         uint256 count = 0;
-        for (uint256 i = messages.length; i > 0; i--) {
+        for (uint256 i = messageCount; i > 0; i--) {
             // 変更するため storage でなければならない。
             Message storage target = messages[i - 1];
             if (target.deleted == false) {
@@ -103,11 +104,11 @@ contract MessageBoard {
 
     // TODO: deleted=true を数えないようにする
     function getMessageCount() external view returns (uint256) {
-        return messages.length;
+        return messageCount;
     }
 
     function getLatestMessages(uint256 count) external view returns (uint256[] memory ids, Message[] memory msgs) {
-        uint256 total = messages.length;
+        uint256 total = messageCount;
         uint256 found;
 
         ids = new uint256[](count);
