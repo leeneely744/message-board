@@ -74,18 +74,10 @@ contract MessageBoard {
         messageCount++;
 
         // delete over messageLimit
-        uint256 count = 0;
-        for (uint256 i = messageCount; i > 0; i--) {
-            // 変更するため storage でなければならない。
-            Message storage target = messages[i - 1];
-            if (target.deleted == false) {
-                count++;
-            }
-
-            if (count > messageLimit) {
-                target.deleted = true;
-                emit MessageDeleted(i - 1, block.timestamp);
-            }
+        if (messageCount - headId == messageLimit) {
+            delete messages[headId];
+            emit MessageDeleted(headId, block.timestamp);
+            headId += 1;
         }
     }
 
