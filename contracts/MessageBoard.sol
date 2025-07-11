@@ -40,7 +40,7 @@ contract MessageBoard {
     }
 
     modifier onlyAuthor(uint256 id) {
-        if (id >= messageCount) {
+        if (id >= messageCount || id < headId) {
             revert InvalidMessageId();
         }
 
