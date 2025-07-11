@@ -22,6 +22,7 @@ contract MessageBoard {
     uint256 public totalTip;
     mapping (uint256=>Message) public messages;
     uint256 public messageCount = 0;
+    uint256 public headId;
 
     uint256 public constant messageLimit = 10;
     mapping (address=>uint256) public lastPostAt;
