@@ -74,7 +74,7 @@ contract MessageBoard {
         messageCount++;
 
         // delete over messageLimit
-        if (messageCount - headId == messageLimit) {
+        if (messageCount - headId > messageLimit) {
             delete messages[headId];
             emit MessageDeleted(headId, block.timestamp);
             headId += 1;
@@ -104,18 +104,29 @@ contract MessageBoard {
         uint256 available = messageCount - headId;
         uint256 n = (count > available) ? available : count;
 
-        ids = new uint256[](count);
-        msgs = new Message[](count);
+        ids = new uint256[](n);
+        msgs = new Message[](n);
 
+        uint256 deleteCount = 0;
         for (uint256 i = 0; i < n; i++) {
-            uint256 idx = i - 1;
+            uint256 idx = messageCount - i - 1;
+            Message memory m = messages[idx];
+
+            if (m.deleted) {
+                i++;
+                deleteCount++;
+            }
+
             ids[i] = idx;
             msgs[i] = messages[idx];
         }
 
-        assembly {
-            mstore(ids, n)
-            mstore(msgs,n)
+        if (deleteCount > 0) {
+            uint256 newLength = n - deleteCount;
+            assembly {
+                mstore(ids, newLength)
+                mstore(msgs, newLength)
+            }
         }
     }
 }
