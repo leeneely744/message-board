@@ -107,24 +107,23 @@ contract MessageBoard {
         ids = new uint256[](n);
         msgs = new Message[](n);
 
-        uint256 deleteCount = 0;
-        for (uint256 i = 0; i < n; i++) {
+        uint256 found = 0;
+        for (uint256 i = messageCount; i-- > headId && found < count; ) {
             uint256 idx = messageCount - i - 1;
             Message memory m = messages[idx];
 
-            if (m.deleted) {
-                deleteCount++;
-            } else {
-                ids[i] = idx;
-                msgs[i] = messages[idx];
-            }
+            // messages は messageLimit より古いものはすべて論理削除されている。
+            if (m.deleted) continue;
+
+            ids[found] = idx;
+            msgs[found] = m;
+            found++;
         }
 
-        if (deleteCount > 0) {
-            uint256 newLength = n - deleteCount;
+        if (found < n) {
             assembly {
-                mstore(ids, newLength)
-                mstore(msgs, newLength)
+                mstore(ids, found)
+                mstore(msgs, found)
             }
         }
     }
