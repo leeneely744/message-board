@@ -75,7 +75,7 @@ contract MessageBoard {
 
         // delete over messageLimit
         if (messageCount - headId > messageLimit) {
-            delete messages[headId];
+            messages[headId].deleted = true;
             emit MessageDeleted(headId, block.timestamp);
             headId += 1;
         }
@@ -113,12 +113,11 @@ contract MessageBoard {
             Message memory m = messages[idx];
 
             if (m.deleted) {
-                i++;
                 deleteCount++;
+            } else {
+                ids[i] = idx;
+                msgs[i] = messages[idx];
             }
-
-            ids[i] = idx;
-            msgs[i] = messages[idx];
         }
 
         if (deleteCount > 0) {
