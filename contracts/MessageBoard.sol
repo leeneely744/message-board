@@ -108,7 +108,8 @@ contract MessageBoard {
         msgs = new Message[](n);
 
         uint256 found = 0;
-        for (uint256 i = messageCount; i-- > headId && found < count; ) {
+        for (uint256 i = messageCount; i > headId && found < count; ) {
+            i--;
             uint256 idx = messageCount - i - 1;
             Message memory m = messages[idx];
 
