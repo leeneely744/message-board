@@ -13,7 +13,7 @@ error TooLongText();
 contract MessageBoard {
     struct Message {
         address sender;
-        string text;
+        string cid;
         uint256 timestamp;
         bool deleted;
     }
@@ -36,7 +36,6 @@ contract MessageBoard {
         uint256 timestamp
     );
     event TipReceived(address indexed sender, uint256 amount);
-    event MessageEdited(uint256 indexed id, string newText, uint256 timestamp);
     event MessageDeleted(uint256 indexed id, uint256 timestamp);
 
     constructor() {
@@ -65,12 +64,12 @@ contract MessageBoard {
     // calldata: imutable temp memory used in function's parameter only
     // In the future, it is require 'reentracyGuard' and 'ownerOnly'
     // payable: allow payment in the function
-    function postMessage(string calldata _text) external payable isNotRapid() {
-        if (bytes(_text).length > MAX_TEXT_BYTES) revert TooLongText();
+    function postMessage(string calldata cid) external payable isNotRapid() {
+        if (bytes(cid).length > MAX_TEXT_BYTES) revert TooLongText();
 
         // memory: mutable temp memory
-        Message memory newMessage = Message(msg.sender, _text, block.timestamp, false);
-        emit MessagePosted(msg.sender, _text, block.timestamp);
+        Message memory newMessage = Message(msg.sender, cid, block.timestamp, false);
+        emit MessagePosted(msg.sender, cid, block.timestamp);
         totalTip += msg.value;
         emit TipReceived(msg.sender, msg.value);
         lastPostAt[msg.sender] = block.timestamp;
@@ -83,12 +82,6 @@ contract MessageBoard {
             emit MessageDeleted(headId, block.timestamp);
             headId += 1;
         }
-    }
-
-    function editMessage(uint256 id, string calldata newText) external onlyAuthor(id) {
-        messages[id].text = newText;
-        messages[id].timestamp = block.timestamp;
-        emit MessageEdited(id, newText, block.timestamp);
     }
 
     function deleteMessage(uint256 id) external onlyAuthor(id) {
