@@ -30,7 +30,11 @@ contract MessageBoard {
     uint256 public constant MAX_TEXT_BYTES = 32;
 
     // Use 'indexed' for debugable
-    event MessagePosted(address indexed sender, string text, uint256 timestamp);
+    event MessagePosted(
+        address indexed sender,
+        string indexed textCid,
+        uint256 timestamp
+    );
     event TipReceived(address indexed sender, uint256 amount);
     event MessageEdited(uint256 indexed id, string newText, uint256 timestamp);
     event MessageDeleted(uint256 indexed id, uint256 timestamp);
