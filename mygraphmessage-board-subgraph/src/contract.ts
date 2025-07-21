@@ -24,7 +24,7 @@ export function handleMessagePosted(event: MessagePostedEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.sender = event.params.sender
-  entity.textCid = event.params.textCid
+  entity.textCid = event.params.textCid.toHexString()
   entity.timestamp = event.params.timestamp
 
   entity.blockNumber = event.block.number
