@@ -25,3 +25,11 @@ type TipReceived @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type Message @entity(immutable: true) {
+  id: Bytes!           # GraphQLで必須
+  sender: Bytes!       # address → Solidityのaddress型
+  cid: String!         # string → SolidityのIPFS CID
+  timestamp: BigInt!   # uint256 → Solidityのタイムスタンプ  
+  deleted: Boolean!    # bool → Solidityのdeleted状態
+}
